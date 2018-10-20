@@ -1,0 +1,19 @@
+# Java class files
+*.class
+
+# Generated files
+/**/bin/
+/**/gen/
+
+
+# Gradle files
+/**/build/
+/**/target/
+/**/.idea/
+
+# Local configuration file (sdk path, etc)
+/**/local.properties
+
+# Log Files
+*.log
+
