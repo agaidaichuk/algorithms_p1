@@ -4,9 +4,7 @@
 # Generated files
 /**/bin/
 /**/gen/
-
-
-# Gradle files
+/**/.DS_Store
 /**/build/
 /**/target/
 /**/.idea/
