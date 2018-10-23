@@ -2,21 +2,23 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class BruteCollinearPoints {
-    private ArrayList<LineSegment> lineSegments;
+    private final ArrayList<LineSegment> lineSegments;
 
-    public BruteCollinearPoints(Point[] points) {   // finds all line segments containing 4 points
-        validateInput(points);
+    public BruteCollinearPoints(Point[] originalPoints) {   // finds all line segments containing 4 points
+        validateInput(originalPoints);
         lineSegments = new ArrayList<>();
+        Point[] points = Arrays.copyOf(originalPoints, originalPoints.length);
         Arrays.sort(points);
         for (int i = 0; i < points.length - 3; i++) {
             for (int j = i + 1; j < points.length - 2; j++) {
                 for (int k = j + 1; k < points.length - 1; k++) {
-                    for (int l = k + 1; l < points.length; l++) {
+                    for (int m = k + 1; m < points.length; m++) {
                         Point p = points[i];
                         Point q = points[j];
                         Point r = points[k];
-                        Point s = points[l];
-                        if (p.slopeTo(q) == p.slopeTo(r) && p.slopeTo(r) == p.slopeTo(s)) {
+                        Point s = points[m];
+                        if (Double.compare(p.slopeTo(q), p.slopeTo(r)) == 0 &&
+                                Double.compare(p.slopeTo(r), p.slopeTo(s)) == 0) {
                             lineSegments.add(new LineSegment(p, s));
                         }
                     }
@@ -33,16 +35,16 @@ public class BruteCollinearPoints {
         return lineSegments.toArray(new LineSegment[0]);
     }
 
-    static void validateInput(Point[] points) {
+    private void validateInput(Point[] points) {
         if (points == null) {
             throw new IllegalArgumentException("Inout array is null");
         }
-        if (points.length < 4) {
-            throw new IllegalArgumentException("Less than 4  points were entered");
-        }
-        for (int i = 0; i < points.length - 1; i++) {
+        for (int i = 0; i < points.length; i++) {
+            if (points[i] == null) {
+                throw new IllegalArgumentException("Input contains null element");
+            }
             for (int j = i + 1; j < points.length; j++) {
-                if (points[i] == null || points[j] == null) {
+                if (points[j] == null) {
                     throw new IllegalArgumentException("Input contains null element");
                 }
                 if (points[i].compareTo(points[j]) == 0) {

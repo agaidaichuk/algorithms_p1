@@ -1,47 +1,33 @@
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 
 public class FastCollinearPoints {
-    private LinkedList<LineSegment> lineSegments;
-    private Map<Point, LinkedList<Double>> endpoints;
+    private final ArrayList<LineSegment> lineSegments;
 
-    public FastCollinearPoints(Point[] points) {    // finds all line segments containing 4 or more points
-        BruteCollinearPoints.validateInput(points);
-        endpoints = new HashMap<>();
-        lineSegments = new LinkedList<>();
+    public FastCollinearPoints(Point[] originalPoints) {    // finds all line segments containing 4 or more points
+        validateInput(originalPoints);
+        lineSegments = new ArrayList<>();
 
+        Point[] points = Arrays.copyOf(originalPoints, originalPoints.length);
         Arrays.sort(points);
 
         for (Point p : points) {
-            int count = 0;
-            int n = points.length - 1;
-            Point[] rest = new Point[n];
+            Point[] rest = Arrays.copyOf(points, points.length);
             Arrays.sort(rest, p.slopeOrder());
-            for (int i = 0; i < n - 1; i++) {
-                if (Double.compare(p.slopeTo(rest[i]), p.slopeTo(rest[i + 1])) == 0) {
-                    count++;
-                } else {
-                    if (count > 2) {
-                        addSegment(p, rest[i]);
+            int min = 1;
+            int max = 2;
+            while (max < rest.length) {
+                if (Double.compare(p.slopeTo(rest[min]), p.slopeTo(rest[max])) != 0) {
+                    if (max - min >= 3 && p.compareTo(rest[min]) < 0) {
+                        lineSegments.add(new LineSegment(p, rest[max - 1]));
                     }
-                    count = 0;
+                    min = max;
                 }
+                max++;
             }
-            if (count > 2) {
-                addSegment(p, rest[n - 1]);
+            if (max - min >= 3 && p.compareTo(rest[min]) < 0) {
+                lineSegments.add(new LineSegment(p, rest[max - 1]));
             }
-        }
-    }
-
-    private void addSegment(Point p, Point that) {
-        Double slope = p.slopeTo(that);
-        LinkedList<Double> slopes = endpoints.getOrDefault(that, new LinkedList<>());
-        if (!slopes.contains(slope)) {
-            lineSegments.add(new LineSegment(p, that));
-            slopes.add(slope);
-            endpoints.put(that, slopes);
         }
     }
 
@@ -51,5 +37,24 @@ public class FastCollinearPoints {
 
     public LineSegment[] segments() {               // the line segments
         return lineSegments.toArray(new LineSegment[0]);
+    }
+
+    private void validateInput(Point[] points) {
+        if (points == null) {
+            throw new IllegalArgumentException("Inout array is null");
+        }
+        for (int i = 0; i < points.length; i++) {
+            if (points[i] == null) {
+                throw new IllegalArgumentException("Input contains null element");
+            }
+            for (int j = i + 1; j < points.length; j++) {
+                if (points[j] == null) {
+                    throw new IllegalArgumentException("Input contains null element");
+                }
+                if (points[i].compareTo(points[j]) == 0) {
+                    throw new IllegalArgumentException("There are duplicates in the input");
+                }
+            }
+        }
     }
 }
